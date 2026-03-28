@@ -21,3 +21,13 @@
   color: #fff !important;
   font-weight: 600;
 }
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+@media (max-width: 767px) {
+  .table-wrapper table {
+    min-width: 500px;
+  }
+}
