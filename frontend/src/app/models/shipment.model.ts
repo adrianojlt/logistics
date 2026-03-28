@@ -3,4 +3,7 @@ export interface ShipmentModel {
   income: number;
   cost: number;
   additionalCost: number;
+  totalCosts: number;
+  profitOrLoss: number;
+  createdAt: string;
 }
