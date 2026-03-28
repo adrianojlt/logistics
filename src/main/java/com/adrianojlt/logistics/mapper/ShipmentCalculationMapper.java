@@ -13,6 +13,7 @@ public interface ShipmentCalculationMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "totalCosts", ignore = true)
     @Mapping(target = "profitOrLoss", ignore = true)
     ShipmentCalculation toEntity(ShipmentCalculationRequestDTO dto);

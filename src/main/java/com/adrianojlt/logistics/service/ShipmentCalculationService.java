@@ -7,6 +7,8 @@ import com.adrianojlt.logistics.mapper.ShipmentCalculationMapper;
 import com.adrianojlt.logistics.repository.ShipmentCalculationRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +42,11 @@ public class ShipmentCalculationService {
         entity.setAdditionalCost(additionalCost);
         entity.setTotalCosts(totalCosts);
         entity.setProfitOrLoss(profitOrLoss);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String createdBy = (authentication != null && authentication.isAuthenticated())
+                ? authentication.getName()
+                : "local";
+        entity.setCreatedBy(createdBy);
 
         ShipmentCalculation saved = repository.save(entity);
 

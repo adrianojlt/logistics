@@ -11,7 +11,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@CrossOrigin(origins = "*")
 @RequestMapping("/api/shipments")
 public class ShipmentCalculationController {
 
@@ -39,7 +37,6 @@ public class ShipmentCalculationController {
     @GetMapping
     public ResponseEntity<ApiResponse<Page<ShipmentCalculationResponseDTO>>> findAll(
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-
         Page<ShipmentCalculationResponseDTO> results = service.findAll(pageable);
         return ResponseEntity.ok(ApiResponse.ok(results));
     }

@@ -16,3 +16,10 @@ spring:
     console:
       enabled: true
       path: /h2-console
+
+app:
+  security:
+    enable-login: true
+  jwt:
+    secret: dachser-logistics-super-secret-key-32-chars-min
+    expiration-ms: 28800000

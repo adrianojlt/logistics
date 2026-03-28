@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: jdbc:mariadb://my_mariadb:3306/logisticsdb
+    driver-class-name: org.mariadb.jdbc.Driver
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  sql:
+    init:
+      mode: never
+  jpa:
+    database-platform: org.hibernate.dialect.MariaDBDialect
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+  h2:
+    console:
+      enabled: false
+
+app:
+  security:
+    enable-login: true
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration-ms: 28800000

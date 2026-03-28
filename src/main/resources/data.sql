@@ -1,3 +1,7 @@
+INSERT INTO users (username, password) VALUES
+    ('adriano', '$2a$10$o8eEJ.i2U1LzX0Ys0pjroeIqRl/sRKewlQvkZnzLV.MdCQQUoWAPa'),
+    ('dachser', '$2a$10$NGEzy3scgS1L5nfq.x3o8.H5ChneJvtysDoJbMI0nzWMQ9KMkRMs.');
+
 -- income > costs
 INSERT INTO shipment_calculation (income, cost, additional_cost, total_costs, profit_or_loss)
 VALUES (5000.00, 3000.00, 200.00, 3200.00, 1800.00);
