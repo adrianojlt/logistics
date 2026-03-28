@@ -5,12 +5,12 @@ import com.adrianojlt.logistics.dto.ShipmentCalculationResponseDTO;
 import com.adrianojlt.logistics.entity.ShipmentCalculation;
 import com.adrianojlt.logistics.mapper.ShipmentCalculationMapper;
 import com.adrianojlt.logistics.repository.ShipmentCalculationRepository;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @Service
 public class ShipmentCalculationService {
@@ -47,10 +47,7 @@ public class ShipmentCalculationService {
     }
 
     @Transactional(readOnly = true)
-    public List<ShipmentCalculationResponseDTO> findAll() {
-        return repository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"))
-                .stream()
-                .map(mapper::toResponseDTO)
-                .toList();
+    public Page<ShipmentCalculationResponseDTO> findAll(Pageable pageable) {
+        return repository.findAll(pageable).map(mapper::toResponseDTO);
     }
 }

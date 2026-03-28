@@ -15,8 +15,10 @@ export class ShipmentService {
     );
   }
 
-  findAll(): Observable<any> {
-    return this.http.get<{ data: any[] }>(this.baseUrl).pipe(
+  findAll(page = 0, size = 10): Observable<any> {
+    return this.http.get<{ data: any }>(this.baseUrl, {
+      params: { page: page.toString(), size: size.toString() },
+    }).pipe(
       map((res) => res.data)
     );
   }
