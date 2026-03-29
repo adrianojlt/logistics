@@ -9,11 +9,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
+@Slf4j
 @Service
 public class ShipmentCalculationService {
 
@@ -49,6 +51,9 @@ public class ShipmentCalculationService {
         entity.setCreatedBy(createdBy);
 
         ShipmentCalculation saved = repository.save(entity);
+
+        log.info("calculation_saved user={} income={} totalCosts={} profitOrLoss={}",
+                createdBy, request.getIncome(), totalCosts, profitOrLoss);
 
         return mapper.toResponseDTO(saved);
     }

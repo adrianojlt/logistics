@@ -17,8 +17,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -42,7 +46,11 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<LoginResponseDTO>> login(@Valid @RequestBody LoginRequestDTO request) {
+    public ResponseEntity<ApiResponse<LoginResponseDTO>> login(
+            @Valid @RequestBody LoginRequestDTO request,
+            HttpServletRequest httpRequest) {
+
+        String ip = resolveClientIp(httpRequest);
 
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
@@ -50,10 +58,22 @@ public class AuthController {
                     request.getPassword())
             );
         } catch (BadCredentialsException e) {
+            log.warn("login_failed username={} ip={}", request.getUsername(), ip);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.error("Invalid credentials"));
         }
 
+        log.info("login_success username={} ip={}", request.getUsername(), ip);
         String token = jwtUtil.generateToken(request.getUsername());
         return ResponseEntity.ok(ApiResponse.ok(new LoginResponseDTO(token, request.getUsername())));
+    }
+
+    private String resolveClientIp(HttpServletRequest request) {
+        String forwardedFor = request.getHeader("X-Forwarded-For");
+
+        if (forwardedFor != null && !forwardedFor.isBlank()) {
+            return forwardedFor.split(",")[0].trim();
+        }
+
+        return request.getRemoteAddr();
     }
 }

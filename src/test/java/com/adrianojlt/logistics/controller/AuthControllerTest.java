@@ -4,6 +4,8 @@ import com.adrianojlt.logistics.dto.ApiResponse;
 import com.adrianojlt.logistics.dto.LoginRequestDTO;
 import com.adrianojlt.logistics.dto.LoginResponseDTO;
 import com.adrianojlt.logistics.security.AppSecurityProperties;
+import com.adrianojlt.logistics.security.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,14 +27,20 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class AuthControllerTest {
 
-    @InjectMocks
-    private AuthController controller;
+    @Mock
+    private JwtUtil jwtUtil;
 
     @Mock
     private AppSecurityProperties securityProperties;
 
     @Mock
     private AuthenticationManager authenticationManager;
+
+    @Mock
+    private HttpServletRequest httpRequest;
+
+    @InjectMocks
+    private AuthController controller;
 
     @Test
     void config_returnsLoginEnabledTrue() {
@@ -57,13 +65,26 @@ class AuthControllerTest {
     }
 
     @Test
+    void login_withValidCredentials_returns200WithTokenAndUsername() {
+        when(jwtUtil.generateToken("adriano")).thenReturn("test.jwt.token");
+
+        ResponseEntity<ApiResponse<LoginResponseDTO>> response =
+                controller.login(new LoginRequestDTO("adriano", "tmp!pass"), httpRequest);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        Assertions.assertNotNull(response.getBody());
+        assertThat(response.getBody().success()).isTrue();
+        assertThat(response.getBody().data().getToken()).isEqualTo("test.jwt.token");
+        assertThat(response.getBody().data().getUsername()).isEqualTo("adriano");
+    }
+
+    @Test
     void login_withInvalidCredentials_returns401() {
         doThrow(new BadCredentialsException("bad credentials"))
                 .when(authenticationManager).authenticate(any());
 
-        ResponseEntity<ApiResponse<LoginResponseDTO>> response = controller.login(new LoginRequestDTO(
-                "adriano",
-                "wrongpassword"));
+        ResponseEntity<ApiResponse<LoginResponseDTO>> response =
+                controller.login(new LoginRequestDTO("adriano", "wrongpassword"), httpRequest);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
         Assertions.assertNotNull(response.getBody());
