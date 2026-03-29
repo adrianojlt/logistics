@@ -2,10 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ShipmentService {
-  private readonly baseUrl = 'http://localhost:8080/api/shipments';
+  private readonly baseUrl = `${environment.apiUrl}/api/shipments`;
 
   constructor(private http: HttpClient) {}
 
