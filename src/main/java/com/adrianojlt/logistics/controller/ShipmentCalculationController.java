@@ -36,7 +36,7 @@ public class ShipmentCalculationController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<Page<ShipmentCalculationResponseDTO>>> findAll(
-            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+            @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<ShipmentCalculationResponseDTO> results = service.findAll(pageable);
         return ResponseEntity.ok(ApiResponse.ok(results));
     }
