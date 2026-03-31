@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.adrianojlt.logistics.util.WebUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,7 +51,7 @@ public class AuthController {
             @Valid @RequestBody LoginRequestDTO request,
             HttpServletRequest httpRequest) {
 
-        String ip = resolveClientIp(httpRequest);
+        String ip = WebUtil.resolveClientIp(httpRequest);
 
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
@@ -67,13 +68,4 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.ok(new LoginResponseDTO(token, request.getUsername())));
     }
 
-    private String resolveClientIp(HttpServletRequest request) {
-        String forwardedFor = request.getHeader("X-Forwarded-For");
-
-        if (forwardedFor != null && !forwardedFor.isBlank()) {
-            return forwardedFor.split(",")[0].trim();
-        }
-
-        return request.getRemoteAddr();
-    }
 }

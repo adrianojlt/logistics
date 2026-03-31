@@ -6,6 +6,7 @@ import com.adrianojlt.logistics.entity.ShipmentCalculation;
 import com.adrianojlt.logistics.mapper.ShipmentCalculationMapper;
 import com.adrianojlt.logistics.repository.ShipmentCalculationRepository;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -38,6 +40,12 @@ class ShipmentCalculationServiceTest {
 
     @Mock
     private ShipmentCalculationRepository repository;
+
+    @BeforeEach
+    void setDefaultSecurityContext() {
+        var auth = new UsernamePasswordAuthenticationToken("test-user", null, List.of());
+        SecurityContextHolder.setContext(new SecurityContextImpl(auth));
+    }
 
     @AfterEach
     void clearSecurityContext() {
@@ -131,7 +139,7 @@ class ShipmentCalculationServiceTest {
     }
 
     @Test
-    void calculate_withNoAuthentication_setsLocalAsCreatedBy() {
+    void calculate_withNoAuthentication_throwsIllegalStateException() {
         SecurityContextHolder.clearContext();
 
         ShipmentCalculationRequestDTO request = ShipmentCalculationRequestDTO.builder()
@@ -139,15 +147,8 @@ class ShipmentCalculationServiceTest {
                 .cost(new BigDecimal("200.00"))
                 .build();
 
-        ShipmentCalculation entity = new ShipmentCalculation();
-
-        when(mapper.toEntity(request)).thenReturn(entity);
-        when(repository.save(entity)).thenReturn(entity);
-        when(mapper.toResponseDTO(entity)).thenReturn(new ShipmentCalculationResponseDTO());
-
-        service.calculate(request);
-
-        assertThat(entity.getCreatedBy()).isEqualTo("local");
+        assertThatThrownBy(() -> service.calculate(request))
+                .isInstanceOf(IllegalStateException.class);
     }
 
     @Test

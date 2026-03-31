@@ -1,6 +1,7 @@
 package com.adrianojlt.logistics.filter;
 
 import com.adrianojlt.logistics.security.JwtUtil;
+import com.adrianojlt.logistics.util.WebUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,7 +42,7 @@ public class AccessLoggingFilter extends OncePerRequestFilter {
                     request.getMethod(),
                     request.getRequestURI(),
                     resolveUsername(request),
-                    resolveClientIp(request),
+                    WebUtil.resolveClientIp(request),
                     response.getStatus(),
                     System.currentTimeMillis() - start);
         }
@@ -61,15 +62,5 @@ public class AccessLoggingFilter extends OncePerRequestFilter {
         }
 
         return jwtUtil.extractUsername(token);
-    }
-
-    private String resolveClientIp(HttpServletRequest request) {
-        String forwardedFor = request.getHeader("X-Forwarded-For");
-
-        if (forwardedFor != null && !forwardedFor.isBlank()) {
-            return forwardedFor.split(",")[0].trim();
-        }
-
-        return request.getRemoteAddr();
     }
 }

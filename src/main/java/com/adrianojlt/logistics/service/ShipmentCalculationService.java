@@ -32,6 +32,14 @@ public class ShipmentCalculationService {
     @Transactional
     public ShipmentCalculationResponseDTO calculate(ShipmentCalculationRequestDTO request) {
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new IllegalStateException("No authenticated user in security context");
+        }
+
+        String createdBy = authentication.getName();
+
         BigDecimal additionalCost = request.getAdditionalCost() != null
                 ? request.getAdditionalCost()
                 : BigDecimal.ZERO;
@@ -44,10 +52,6 @@ public class ShipmentCalculationService {
         entity.setAdditionalCost(additionalCost);
         entity.setTotalCosts(totalCosts);
         entity.setProfitOrLoss(profitOrLoss);
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String createdBy = (authentication != null && authentication.isAuthenticated())
-                ? authentication.getName()
-                : "local";
         entity.setCreatedBy(createdBy);
 
         ShipmentCalculation saved = repository.save(entity);
