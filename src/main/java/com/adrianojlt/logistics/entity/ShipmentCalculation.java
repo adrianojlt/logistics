@@ -45,6 +45,15 @@ public class ShipmentCalculation {
     @Column(nullable = false)
     private BigDecimal profitMargin;
 
+    @Column(nullable = false, length = 100)
+    private String origin;
+
+    @Column(nullable = false, length = 100)
+    private String destination;
+
+    @Column(nullable = true, length = 100)
+    private String carrier;
+
     @Column(name = "created_by", nullable = false, updatable = false, length = 50)
     private String createdBy;
 

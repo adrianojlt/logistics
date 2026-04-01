@@ -172,13 +172,13 @@ class ShipmentCalculationServiceTest {
         ShipmentCalculation entity = new ShipmentCalculation();
         ShipmentCalculationResponseDTO dto = new ShipmentCalculationResponseDTO();
 
-        when(repository.findWithFilters(null, null, false, false)).thenReturn(List.of(entity));
+        when(repository.findWithFilters(null, null, false, false, null)).thenReturn(List.of(entity));
         when(mapper.toResponseDTO(entity)).thenReturn(dto);
 
-        List<ShipmentCalculationResponseDTO> result = service.findAll(null, null, false, false);
+        List<ShipmentCalculationResponseDTO> result = service.findAll(null, null, false, false, null);
 
         assertThat(result).containsExactly(dto);
-        verify(repository).findWithFilters(null, null, false, false);
+        verify(repository).findWithFilters(null, null, false, false, null);
     }
 
     private ShipmentCalculation buildEntity(Long id, String income, String cost,

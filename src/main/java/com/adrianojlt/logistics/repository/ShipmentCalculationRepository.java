@@ -1,5 +1,6 @@
 package com.adrianojlt.logistics.repository;
 
+import com.adrianojlt.logistics.dto.CarrierStatsDTO;
 import com.adrianojlt.logistics.entity.ShipmentCalculation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -39,12 +40,25 @@ public interface ShipmentCalculationRepository extends JpaRepository<ShipmentCal
            "(:startDate IS NULL OR s.createdAt >= :startDate) AND " +
            "(:endDate IS NULL OR s.createdAt <= :endDate) AND " +
            "(:onlyLosses = false OR s.profitOrLoss < 0) AND " +
-           "(:onlyProfits = false OR s.profitOrLoss > 0) " +
+           "(:onlyProfits = false OR s.profitOrLoss > 0) AND " +
+           "(:carrier IS NULL OR s.carrier = :carrier) " +
            "ORDER BY s.createdAt DESC")
     List<ShipmentCalculation> findWithFilters(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate,
             @Param("onlyLosses") boolean onlyLosses,
-            @Param("onlyProfits") boolean onlyProfits
+            @Param("onlyProfits") boolean onlyProfits,
+            @Param("carrier") String carrier
     );
+
+    @Query("SELECT DISTINCT s.carrier FROM ShipmentCalculation s WHERE s.carrier IS NOT NULL ORDER BY s.carrier")
+    List<String> findDistinctCarriers();
+
+    @Query("SELECT new com.adrianojlt.logistics.dto.CarrierStatsDTO(" +
+           "s.carrier, AVG(s.profitMargin), COUNT(s)) " +
+           "FROM ShipmentCalculation s " +
+           "WHERE s.carrier IS NOT NULL " +
+           "GROUP BY s.carrier " +
+           "ORDER BY AVG(s.profitMargin) DESC")
+    List<CarrierStatsDTO> findStatsByCarrier();
 }

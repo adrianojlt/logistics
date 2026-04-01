@@ -118,7 +118,7 @@ class ShipmentCalculationControllerTest {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        when(service.findAll(any(), any(), anyBoolean(), anyBoolean())).thenReturn(List.of(dto));
+        when(service.findAll(any(), any(), anyBoolean(), anyBoolean(), any())).thenReturn(List.of(dto));
 
         mockMvc.perform(get("/api/shipments")
                         .with(user("adriano").roles("USER")))

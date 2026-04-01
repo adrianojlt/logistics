@@ -130,7 +130,7 @@
     </div>
 
     <!-- Line Chart -->
-    <div class="row g-3">
+    <div class="row g-3 mb-4">
       <div class="col-12">
         <div class="chart-card">
           <h3 class="chart-title">Profit / Loss Trend</h3>
@@ -148,6 +148,28 @@
               [showRefLines]="true"
             />
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Carrier Bar Chart -->
+    <div class="row g-3">
+      <div class="col-12">
+        <div class="chart-card">
+          <h3 class="chart-title">Avg Margin by Carrier</h3>
+          @if (carrierChartData.length === 0) {
+            <p class="text-muted fst-italic">No carrier data available yet.</p>
+          } @else {
+            <div class="chart-area" style="height: 250px;">
+              <ngx-charts-bar-horizontal
+                [results]="carrierChartData"
+                [scheme]="carrierColorScheme"
+                [showXAxisLabel]="true"
+                xAxisLabel="Average Margin (%)"
+                [showDataLabel]="true"
+              />
+            </div>
+          }
         </div>
       </div>
     </div>

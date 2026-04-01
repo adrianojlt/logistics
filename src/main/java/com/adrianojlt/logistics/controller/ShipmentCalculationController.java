@@ -1,6 +1,7 @@
 package com.adrianojlt.logistics.controller;
 
 import com.adrianojlt.logistics.dto.ApiResponse;
+import com.adrianojlt.logistics.dto.CarrierStatsDTO;
 import com.adrianojlt.logistics.dto.ShipmentCalculationRequestDTO;
 import com.adrianojlt.logistics.dto.ShipmentCalculationResponseDTO;
 import com.adrianojlt.logistics.dto.ShipmentStatsDTO;
@@ -45,12 +46,23 @@ public class ShipmentCalculationController {
             @RequestParam(required = false) String startDate,
             @RequestParam(required = false) String endDate,
             @RequestParam(defaultValue = "false") boolean onlyLosses,
-            @RequestParam(defaultValue = "false") boolean onlyProfits) {
+            @RequestParam(defaultValue = "false") boolean onlyProfits,
+            @RequestParam(required = false) String carrier) {
 
         LocalDateTime start = startDate != null ? LocalDateTime.parse(startDate) : null;
         LocalDateTime end = endDate != null ? LocalDateTime.parse(endDate) : null;
 
-        List<ShipmentCalculationResponseDTO> results = service.findAll(start, end, onlyLosses, onlyProfits);
+        List<ShipmentCalculationResponseDTO> results = service.findAll(start, end, onlyLosses, onlyProfits, carrier);
         return ResponseEntity.ok(ApiResponse.ok(results));
+    }
+
+    @GetMapping("/carriers")
+    public ResponseEntity<ApiResponse<List<String>>> getCarriers() {
+        return ResponseEntity.ok(ApiResponse.ok(service.getDistinctCarriers()));
+    }
+
+    @GetMapping("/stats/by-carrier")
+    public ResponseEntity<ApiResponse<List<CarrierStatsDTO>>> getStatsByCarrier() {
+        return ResponseEntity.ok(ApiResponse.ok(service.getStatsByCarrier()));
     }
 }

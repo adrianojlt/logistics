@@ -1,5 +1,6 @@
 package com.adrianojlt.logistics.service;
 
+import com.adrianojlt.logistics.dto.CarrierStatsDTO;
 import com.adrianojlt.logistics.dto.ShipmentCalculationRequestDTO;
 import com.adrianojlt.logistics.dto.ShipmentCalculationResponseDTO;
 import com.adrianojlt.logistics.dto.ShipmentStatsDTO;
@@ -91,11 +92,22 @@ public class ShipmentCalculationService {
             LocalDateTime startDate,
             LocalDateTime endDate,
             boolean onlyLosses,
-            boolean onlyProfits) {
+            boolean onlyProfits,
+            String carrier) {
 
-        return repository.findWithFilters(startDate, endDate, onlyLosses, onlyProfits)
+        return repository.findWithFilters(startDate, endDate, onlyLosses, onlyProfits, carrier)
                 .stream()
                 .map(mapper::toResponseDTO)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<String> getDistinctCarriers() {
+        return repository.findDistinctCarriers();
+    }
+
+    @Transactional(readOnly = true)
+    public List<CarrierStatsDTO> getStatsByCarrier() {
+        return repository.findStatsByCarrier();
     }
 }

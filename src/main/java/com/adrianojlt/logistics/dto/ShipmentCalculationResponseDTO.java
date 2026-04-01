@@ -24,5 +24,9 @@ public class ShipmentCalculationResponseDTO {
     private BigDecimal profitOrLoss;
     private BigDecimal profitMargin;
 
+    private String origin;
+    private String destination;
+    private String carrier;
+
     private LocalDateTime createdAt;
 }
