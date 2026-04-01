@@ -4,12 +4,19 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { ShipmentModel } from '../models/shipment.model';
+import { ShipmentStatsModel } from '../models/shipment-stats.model';
 
 @Injectable({ providedIn: 'root' })
 export class ShipmentService {
   private readonly baseUrl = `${environment.apiUrl}/api/shipments`;
 
   constructor(private http: HttpClient) {}
+
+  getStats(): Observable<ShipmentStatsModel> {
+    return this.http.get<{ data: ShipmentStatsModel }>(`${this.baseUrl}/stats`).pipe(
+      map((res) => res.data)
+    );
+  }
 
   calculate(payload: { income: number; cost: number; additionalCost: number }): Observable<ShipmentModel> {
     return this.http.post<{ data: ShipmentModel }>(`${this.baseUrl}/calculate`, payload).pipe(

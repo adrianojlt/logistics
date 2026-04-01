@@ -3,6 +3,7 @@ package com.adrianojlt.logistics.controller;
 import com.adrianojlt.logistics.dto.ApiResponse;
 import com.adrianojlt.logistics.dto.ShipmentCalculationRequestDTO;
 import com.adrianojlt.logistics.dto.ShipmentCalculationResponseDTO;
+import com.adrianojlt.logistics.dto.ShipmentStatsDTO;
 import com.adrianojlt.logistics.service.ShipmentCalculationService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -32,6 +33,11 @@ public class ShipmentCalculationController {
             @Valid @RequestBody ShipmentCalculationRequestDTO request) {
         ShipmentCalculationResponseDTO result = service.calculate(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(result));
+    }
+
+    @GetMapping("/stats")
+    public ResponseEntity<ApiResponse<ShipmentStatsDTO>> getStats() {
+        return ResponseEntity.ok(ApiResponse.ok(service.getStats()));
     }
 
     @GetMapping

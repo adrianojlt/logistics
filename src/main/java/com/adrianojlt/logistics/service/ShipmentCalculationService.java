@@ -2,6 +2,7 @@ package com.adrianojlt.logistics.service;
 
 import com.adrianojlt.logistics.dto.ShipmentCalculationRequestDTO;
 import com.adrianojlt.logistics.dto.ShipmentCalculationResponseDTO;
+import com.adrianojlt.logistics.dto.ShipmentStatsDTO;
 import com.adrianojlt.logistics.entity.ShipmentCalculation;
 import com.adrianojlt.logistics.mapper.ShipmentCalculationMapper;
 import com.adrianojlt.logistics.repository.ShipmentCalculationRepository;
@@ -68,6 +69,21 @@ public class ShipmentCalculationService {
                 createdBy, request.getIncome(), totalCosts, profitOrLoss, profitMargin);
 
         return mapper.toResponseDTO(saved);
+    }
+
+    @Transactional(readOnly = true)
+    public ShipmentStatsDTO getStats() {
+
+        return ShipmentStatsDTO.builder()
+                .totalShipments(repository.countAll())
+                .totalIncome(repository.sumIncome())
+                .totalCosts(repository.sumTotalCosts())
+                .netProfitOrLoss(repository.sumProfitOrLoss())
+                .profitableCount(repository.countProfitable())
+                .lossCount(repository.countLoss())
+                .breakEvenCount(repository.countBreakEven())
+                .averageMargin(repository.averageMargin().setScale(2, RoundingMode.HALF_UP))
+                .build();
     }
 
     @Transactional(readOnly = true)
