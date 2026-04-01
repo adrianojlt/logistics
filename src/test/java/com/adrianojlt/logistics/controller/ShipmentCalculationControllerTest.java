@@ -11,8 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -21,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -107,7 +106,7 @@ class ShipmentCalculationControllerTest {
     }
 
     @Test
-    void findAll_returns200WithPagedResults() throws Exception {
+    void findAll_returns200WithFilteredResults() throws Exception {
         ShipmentCalculationResponseDTO dto = ShipmentCalculationResponseDTO.builder()
                 .id(1L)
                 .income(new BigDecimal("1000.00"))
@@ -115,18 +114,18 @@ class ShipmentCalculationControllerTest {
                 .additionalCost(BigDecimal.ZERO)
                 .totalCosts(new BigDecimal("200.00"))
                 .profitOrLoss(new BigDecimal("800.00"))
+                .profitMargin(new BigDecimal("80.00"))
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        when(service.findAll(any())).thenReturn(
-                new PageImpl<>(List.of(dto), PageRequest.of(0, 10), 1));
+        when(service.findAll(any(), any(), anyBoolean(), anyBoolean())).thenReturn(List.of(dto));
 
         mockMvc.perform(get("/api/shipments")
                         .with(user("adriano").roles("USER")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.data.content[0].id").value(1))
-                .andExpect(jsonPath("$.data.totalElements").value(1));
+                .andExpect(jsonPath("$.data[0].id").value(1))
+                .andExpect(jsonPath("$.data[0].profitMargin").value(80.00));
     }
 
     @Test

@@ -42,6 +42,9 @@ public class ShipmentCalculation {
     @Column(nullable = false)
     private BigDecimal profitOrLoss;
 
+    @Column(nullable = false)
+    private BigDecimal profitMargin;
+
     @Column(name = "created_by", nullable = false, updatable = false, length = 50)
     private String createdBy;
 

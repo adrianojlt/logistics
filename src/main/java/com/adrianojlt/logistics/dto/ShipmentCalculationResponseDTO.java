@@ -22,6 +22,7 @@ public class ShipmentCalculationResponseDTO {
 
     private BigDecimal totalCosts;
     private BigDecimal profitOrLoss;
+    private BigDecimal profitMargin;
 
     private LocalDateTime createdAt;
 }

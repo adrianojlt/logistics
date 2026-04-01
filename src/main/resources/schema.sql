@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS shipment_calculation (
     additional_cost  DECIMAL(10, 2)  NOT NULL DEFAULT 0,
     total_costs      DECIMAL(10, 2)  NOT NULL,
     profit_or_loss   DECIMAL(10, 2)  NOT NULL,
+    profit_margin    DECIMAL(10, 2)  NOT NULL DEFAULT 0,
     created_by       VARCHAR(50)     NOT NULL DEFAULT 'system',
     created_at       TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

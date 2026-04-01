@@ -12,10 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
@@ -61,8 +57,8 @@ class ShipmentCalculationServiceTest {
                 .build();
 
         ShipmentCalculation entity = new ShipmentCalculation();
-        ShipmentCalculation saved = buildEntity(1L, "1000.00", "200.00", "50.00", "250.00", "750.00");
-        ShipmentCalculationResponseDTO expectedResponse = buildResponseDTO(1L, "1000.00", "200.00", "50.00", "250.00", "750.00");
+        ShipmentCalculation saved = buildEntity(1L, "1000.00", "200.00", "50.00", "250.00", "750.00", "75.00");
+        ShipmentCalculationResponseDTO expectedResponse = buildResponseDTO(1L, "1000.00", "200.00", "50.00", "250.00", "750.00", "75.00");
 
         when(mapper.toEntity(request)).thenReturn(entity);
         when(repository.save(entity)).thenReturn(saved);
@@ -73,6 +69,7 @@ class ShipmentCalculationServiceTest {
         assertThat(result).isEqualTo(expectedResponse);
         assertThat(entity.getTotalCosts()).isEqualByComparingTo("250.00");
         assertThat(entity.getProfitOrLoss()).isEqualByComparingTo("750.00");
+        assertThat(entity.getProfitMargin()).isEqualByComparingTo("75.00");
         verify(repository).save(entity);
     }
 
@@ -95,6 +92,25 @@ class ShipmentCalculationServiceTest {
         assertThat(entity.getAdditionalCost()).isEqualByComparingTo(BigDecimal.ZERO);
         assertThat(entity.getTotalCosts()).isEqualByComparingTo("300.00");
         assertThat(entity.getProfitOrLoss()).isEqualByComparingTo("200.00");
+    }
+
+    @Test
+    void calculate_withZeroIncome_setsProfitMarginToZero() {
+        ShipmentCalculationRequestDTO request = ShipmentCalculationRequestDTO.builder()
+                .income(BigDecimal.ZERO)
+                .cost(new BigDecimal("100.00"))
+                .additionalCost(null)
+                .build();
+
+        ShipmentCalculation entity = new ShipmentCalculation();
+
+        when(mapper.toEntity(request)).thenReturn(entity);
+        when(repository.save(entity)).thenReturn(entity);
+        when(mapper.toResponseDTO(entity)).thenReturn(new ShipmentCalculationResponseDTO());
+
+        service.calculate(request);
+
+        assertThat(entity.getProfitMargin()).isEqualByComparingTo(BigDecimal.ZERO);
     }
 
     @Test
@@ -153,23 +169,20 @@ class ShipmentCalculationServiceTest {
 
     @Test
     void findAll_delegatesToRepositoryAndMapsResults() {
-        Pageable pageable = PageRequest.of(0, 10);
         ShipmentCalculation entity = new ShipmentCalculation();
         ShipmentCalculationResponseDTO dto = new ShipmentCalculationResponseDTO();
-        Page<ShipmentCalculation> entityPage = new PageImpl<>(List.of(entity), pageable, 1);
 
-        when(repository.findAll(pageable)).thenReturn(entityPage);
+        when(repository.findWithFilters(null, null, false, false)).thenReturn(List.of(entity));
         when(mapper.toResponseDTO(entity)).thenReturn(dto);
 
-        Page<ShipmentCalculationResponseDTO> result = service.findAll(pageable);
+        List<ShipmentCalculationResponseDTO> result = service.findAll(null, null, false, false);
 
-        assertThat(result.getContent()).containsExactly(dto);
-        assertThat(result.getTotalElements()).isEqualTo(1);
-        verify(repository).findAll(pageable);
+        assertThat(result).containsExactly(dto);
+        verify(repository).findWithFilters(null, null, false, false);
     }
 
     private ShipmentCalculation buildEntity(Long id, String income, String cost,
-            String additionalCost, String totalCosts, String profitOrLoss) {
+            String additionalCost, String totalCosts, String profitOrLoss, String profitMargin) {
         return ShipmentCalculation.builder()
                 .id(id)
                 .income(new BigDecimal(income))
@@ -177,13 +190,14 @@ class ShipmentCalculationServiceTest {
                 .additionalCost(new BigDecimal(additionalCost))
                 .totalCosts(new BigDecimal(totalCosts))
                 .profitOrLoss(new BigDecimal(profitOrLoss))
+                .profitMargin(new BigDecimal(profitMargin))
                 .createdBy("local")
                 .createdAt(LocalDateTime.now())
                 .build();
     }
 
     private ShipmentCalculationResponseDTO buildResponseDTO(Long id, String income, String cost,
-            String additionalCost, String totalCosts, String profitOrLoss) {
+            String additionalCost, String totalCosts, String profitOrLoss, String profitMargin) {
         return ShipmentCalculationResponseDTO.builder()
                 .id(id)
                 .income(new BigDecimal(income))
@@ -191,6 +205,7 @@ class ShipmentCalculationServiceTest {
                 .additionalCost(new BigDecimal(additionalCost))
                 .totalCosts(new BigDecimal(totalCosts))
                 .profitOrLoss(new BigDecimal(profitOrLoss))
+                .profitMargin(new BigDecimal(profitMargin))
                 .build();
     }
 }

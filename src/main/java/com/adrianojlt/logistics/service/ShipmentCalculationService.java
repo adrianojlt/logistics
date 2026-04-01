@@ -5,8 +5,6 @@ import com.adrianojlt.logistics.dto.ShipmentCalculationResponseDTO;
 import com.adrianojlt.logistics.entity.ShipmentCalculation;
 import com.adrianojlt.logistics.mapper.ShipmentCalculationMapper;
 import com.adrianojlt.logistics.repository.ShipmentCalculationRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -47,23 +48,38 @@ public class ShipmentCalculationService {
         BigDecimal totalCosts = request.getCost().add(additionalCost);
         BigDecimal profitOrLoss = request.getIncome().subtract(totalCosts);
 
+        BigDecimal profitMargin = request.getIncome().compareTo(BigDecimal.ZERO) == 0
+                ? BigDecimal.ZERO
+                : profitOrLoss.divide(request.getIncome(), 4, RoundingMode.HALF_UP)
+                              .multiply(new BigDecimal("100"))
+                              .setScale(2, RoundingMode.HALF_UP);
+
         ShipmentCalculation entity = mapper.toEntity(request);
 
         entity.setAdditionalCost(additionalCost);
         entity.setTotalCosts(totalCosts);
         entity.setProfitOrLoss(profitOrLoss);
+        entity.setProfitMargin(profitMargin);
         entity.setCreatedBy(createdBy);
 
         ShipmentCalculation saved = repository.save(entity);
 
-        log.info("calculation_saved user={} income={} totalCosts={} profitOrLoss={}",
-                createdBy, request.getIncome(), totalCosts, profitOrLoss);
+        log.info("calculation_saved user={} income={} totalCosts={} profitOrLoss={} profitMargin={}",
+                createdBy, request.getIncome(), totalCosts, profitOrLoss, profitMargin);
 
         return mapper.toResponseDTO(saved);
     }
 
     @Transactional(readOnly = true)
-    public Page<ShipmentCalculationResponseDTO> findAll(Pageable pageable) {
-        return repository.findAll(pageable).map(mapper::toResponseDTO);
+    public List<ShipmentCalculationResponseDTO> findAll(
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            boolean onlyLosses,
+            boolean onlyProfits) {
+
+        return repository.findWithFilters(startDate, endDate, onlyLosses, onlyProfits)
+                .stream()
+                .map(mapper::toResponseDTO)
+                .toList();
     }
 }
