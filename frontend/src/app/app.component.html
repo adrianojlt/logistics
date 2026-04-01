@@ -1,32 +1,67 @@
 @if (!isLoginPage) {
-  <div class="app-shell">
-    <aside class="sidebar">
-      <div class="logo-area">
-        <img src="assets/logo.png" alt="DACHSER Intelligent Logistics" />
-      </div>
-      <nav>
-        <a class="nav-item" routerLink="/dashboard" routerLinkActive="active">
-          <mat-icon>dashboard</mat-icon>
-          Dashboard
-        </a>
-        <a class="nav-item" routerLink="/calculate-profit" routerLinkActive="active">
-          <mat-icon>calculate</mat-icon>
-          Calculate Profit
-        </a>
-      </nav>
-      @if (authService.loginEnabled) {
-        <div class="sidebar-footer">
+  @if (isMobile) {
+    <mat-toolbar class="mobile-toolbar">
+      <button mat-icon-button (click)="toggleSidenav()">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <span class="toolbar-logo">DACHSER</span>
+    </mat-toolbar>
+    <mat-sidenav-container class="sidenav-container">
+      <mat-sidenav #sidenav mode="over" [opened]="sidenavOpened" (backdropClick)="closeSidenav()">
+        <nav class="mobile-nav">
+          <a class="nav-item" routerLink="/dashboard" routerLinkActive="active" (click)="closeSidenav()">
+            <mat-icon>dashboard</mat-icon>
+            Dashboard
+          </a>
+          <a class="nav-item" routerLink="/calculate-profit" routerLinkActive="active" (click)="closeSidenav()">
+            <mat-icon>calculate</mat-icon>
+            Calculate Profit
+          </a>
+        </nav>
+        <mat-divider></mat-divider>
+        <div class="mobile-footer">
           <span class="username-label">{{ authService.getUsername() }}</span>
           <button mat-icon-button (click)="logout()" title="Logout">
             <mat-icon>logout</mat-icon>
           </button>
         </div>
-      }
-    </aside>
-    <main class="main-content">
-      <router-outlet />
-    </main>
-  </div>
+      </mat-sidenav>
+      <mat-sidenav-content>
+        <main class="main-content">
+          <router-outlet />
+        </main>
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  } @else {
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="logo-area">
+          <img src="assets/logo.png" alt="DACHSER Intelligent Logistics" />
+        </div>
+        <nav>
+          <a class="nav-item" routerLink="/dashboard" routerLinkActive="active">
+            <mat-icon>dashboard</mat-icon>
+            Dashboard
+          </a>
+          <a class="nav-item" routerLink="/calculate-profit" routerLinkActive="active">
+            <mat-icon>calculate</mat-icon>
+            Calculate Profit
+          </a>
+        </nav>
+        @if (authService.loginEnabled) {
+          <div class="sidebar-footer">
+            <span class="username-label">{{ authService.getUsername() }}</span>
+            <button mat-icon-button (click)="logout()" title="Logout">
+              <mat-icon>logout</mat-icon>
+            </button>
+          </div>
+        }
+      </aside>
+      <main class="main-content">
+        <router-outlet />
+      </main>
+    </div>
+  }
 } @else {
   <router-outlet />
 }
