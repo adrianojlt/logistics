@@ -17,6 +17,10 @@
             <mat-icon>calculate</mat-icon>
             Calculate Profit
           </a>
+          <a class="nav-item" routerLink="/ask-ai" routerLinkActive="active" (click)="closeSidenav()">
+            <mat-icon>smart_toy</mat-icon>
+            Ask AI
+          </a>
         </nav>
         <mat-divider></mat-divider>
         <div class="mobile-footer">
@@ -46,6 +50,10 @@
           <a class="nav-item" routerLink="/calculate-profit" routerLinkActive="active">
             <mat-icon>calculate</mat-icon>
             Calculate Profit
+          </a>
+          <a class="nav-item" routerLink="/ask-ai" routerLinkActive="active">
+            <mat-icon>smart_toy</mat-icon>
+            Ask AI
           </a>
         </nav>
         @if (authService.loginEnabled) {

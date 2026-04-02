@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CarrierStatsDTO {
-
     private String carrier;
     private Double averageMargin;
     private long shipmentCount;

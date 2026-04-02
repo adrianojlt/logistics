@@ -62,7 +62,6 @@ public class ShipmentCalculation {
 
     @PrePersist
     protected void onCreate() {
-
         if (createdAt == null) {
             createdAt = LocalDateTime.now();
         }

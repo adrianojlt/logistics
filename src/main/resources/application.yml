@@ -29,3 +29,17 @@ app:
   jwt:
     secret: dachser-logistics-super-secret-key-32-chars-min
     expiration-ms: 28800000
+
+ai:
+  active-provider: mistral
+
+  providers:
+    groq:
+      url: https://api.groq.com/openai/v1/chat/completions
+      model: llama3-70b-8192
+      api-key: ${GROQ_API_KEY}
+
+    mistral:
+      url: https://api.mistral.ai/v1/chat/completions
+      model: mistral-small-latest
+      api-key: ${MISTRAL_API_KEY}

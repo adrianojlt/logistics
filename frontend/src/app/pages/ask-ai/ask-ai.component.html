@@ -1,0 +1,49 @@
+<div class="ask-ai-container">
+  <h2 class="page-title">Ask AI</h2>
+  <p class="page-subtitle">Ask a question about your shipment data:</p>
+
+  <mat-form-field appearance="outline" class="question-field">
+    <mat-label>Your question</mat-label>
+    <textarea
+      matInput
+      rows="3"
+      [(ngModel)]="question"
+      (keydown.enter)="$event.preventDefault(); ask()"
+      placeholder="e.g. Which carrier has the best average profit margin?">
+    </textarea>
+  </mat-form-field>
+
+  <div class="actions">
+    <button
+      mat-raised-button
+      color="primary"
+      [disabled]="isLoading || !question.trim()"
+      (click)="ask()">
+      @if (isLoading) {
+        <mat-spinner diameter="20"></mat-spinner>
+      } @else {
+        Ask
+      }
+    </button>
+  </div>
+
+  @if (generatedSql) {
+    <mat-expansion-panel class="sql-panel">
+      <mat-expansion-panel-header>
+        <mat-panel-title>Generated SQL</mat-panel-title>
+      </mat-expansion-panel-header>
+      <pre class="sql-code">{{ generatedSql }}</pre>
+    </mat-expansion-panel>
+  }
+
+  @if (answer) {
+    <div class="answer-card">
+      <p class="answer-label">Answer:</p>
+      <p class="answer-text">{{ answer }}</p>
+    </div>
+  }
+
+  @if (errorMessage) {
+    <p class="error-message">{{ errorMessage }}</p>
+  }
+</div>

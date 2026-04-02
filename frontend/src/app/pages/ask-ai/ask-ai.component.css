@@ -1,0 +1,70 @@
+.ask-ai-container {
+  padding: 24px;
+  max-width: 800px;
+}
+
+.page-title {
+  margin: 0 0 4px 0;
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.page-subtitle {
+  margin: 0 0 16px 0;
+  color: #666;
+}
+
+.question-field {
+  width: 100%;
+}
+
+.actions {
+  margin-bottom: 24px;
+}
+
+.actions button {
+  min-width: 100px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.sql-panel {
+  margin-bottom: 16px;
+}
+
+.sql-code {
+  font-family: monospace;
+  font-size: 0.875rem;
+  background: #f5f5f5;
+  padding: 12px;
+  border-radius: 4px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  margin: 0;
+}
+
+.answer-card {
+  background: #f0f7ff;
+  border-left: 4px solid #1976d2;
+  padding: 16px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.answer-label {
+  font-weight: 600;
+  margin: 0 0 8px 0;
+}
+
+.answer-text {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.error-message {
+  color: #d32f2f;
+  font-size: 0.875rem;
+  margin: 0;
+}
