@@ -2,6 +2,13 @@
 
 Web application for calculating and tracking shipment profit/loss.
 
+## Features
+
+- Shipment profit/loss calculation (income, direct cost, additional cost, margin)
+- Dashboard with charts: income vs. cost per shipment, margin trends over time, carrier performance
+- Filtering by date range, carrier, and profit/loss status
+- Ask AI: natural language queries over shipment data powered by text-to-SQL via LLM
+
 ## Stack
 
 | Layer | Technology |
@@ -23,7 +30,7 @@ mvn spring-boot:run
 cd frontend && npm install && ng serve
 ```
 
-Open http://localhost:4200/dachser and log in with one of the dev accounts below.
+Open http://localhost:4200/dachserboard and log in with one of the dev accounts below.
 
 H2 console available at http://localhost:8080/h2-console (JDBC URL: `jdbc:h2:mem:logisticsdb`).
 
@@ -34,7 +41,11 @@ H2 console available at http://localhost:8080/h2-console (JDBC URL: `jdbc:h2:mem
 | `POST` | `/api/auth/login` | public | Returns JWT token |
 | `GET` | `/api/auth/config` | public | Returns `loginEnabled` flag |
 | `POST` | `/api/shipments/calculate` | required | Calculates and saves profit/loss |
-| `GET` | `/api/shipments` | required | Paginated list of calculations |
+| `GET` | `/api/shipments` | required | Paginated list with filtering |
+| `GET` | `/api/shipments/stats` | required | Aggregate statistics |
+| `GET` | `/api/shipments/carriers` | required | Distinct carrier list |
+| `GET` | `/api/shipments/stats/by-carrier` | required | Per-carrier analytics |
+| `POST` | `/api/ai/ask` | required | Natural language query (Ask AI) |
 
 ## Tests
 
@@ -44,7 +55,7 @@ mvn test
 
 ---
 
-## docker
+## Docker
 
 Docker commands used for build and deploy:
 
