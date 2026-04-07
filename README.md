@@ -23,7 +23,7 @@ mvn spring-boot:run
 cd frontend && npm install && ng serve
 ```
 
-Open http://localhost:4200/dachser and log in with one of the dev accounts below.
+Open http://localhost:4200/dachser and log in with the account that was sent to you.
 
 H2 console available at http://localhost:8080/h2-console (JDBC URL: `jdbc:h2:mem:logisticsdb`).
 
