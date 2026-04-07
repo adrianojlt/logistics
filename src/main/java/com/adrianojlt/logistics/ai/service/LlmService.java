@@ -8,6 +8,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -40,15 +42,32 @@ public class LlmService {
 
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
 
-        ResponseEntity<Map> response = restTemplate.postForEntity(
-            provider.getUrl(), request, Map.class
-        );
+        ResponseEntity<Map> response;
+        try {
+            response = restTemplate.postForEntity(provider.getUrl(), request, Map.class);
+        } catch (HttpClientErrorException e) {
+            throw new IllegalStateException("LLM provider rejected the request (HTTP " + e.getStatusCode() + ")", e);
+        } catch (HttpServerErrorException e) {
+            throw new IllegalStateException("LLM provider returned a server error (HTTP " + e.getStatusCode() + ")", e);
+        }
+
+        if (response.getBody() == null) {
+            throw new IllegalStateException("LLM provider returned an empty response body");
+        }
 
         @SuppressWarnings("unchecked")
         List<Map<String, Object>> choices = (List<Map<String, Object>>) response.getBody().get("choices");
 
+        if (choices == null || choices.isEmpty()) {
+            throw new IllegalStateException("LLM provider response contained no choices");
+        }
+
         @SuppressWarnings("unchecked")
         Map<String, Object> message = (Map<String, Object>) choices.get(0).get("message");
+
+        if (message == null || message.get("content") == null) {
+            throw new IllegalStateException("LLM provider response message content is missing");
+        }
 
         return message.get("content").toString().trim();
     }

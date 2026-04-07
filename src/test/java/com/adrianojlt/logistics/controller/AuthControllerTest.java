@@ -4,7 +4,7 @@ import com.adrianojlt.logistics.dto.ApiResponse;
 import com.adrianojlt.logistics.dto.LoginRequestDTO;
 import com.adrianojlt.logistics.dto.LoginResponseDTO;
 import com.adrianojlt.logistics.security.AppSecurityProperties;
-import com.adrianojlt.logistics.security.JwtUtil;
+import com.adrianojlt.logistics.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -14,13 +14,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
@@ -28,13 +26,10 @@ import static org.mockito.Mockito.when;
 class AuthControllerTest {
 
     @Mock
-    private JwtUtil jwtUtil;
+    private AuthService authService;
 
     @Mock
     private AppSecurityProperties securityProperties;
-
-    @Mock
-    private AuthenticationManager authenticationManager;
 
     @Mock
     private HttpServletRequest httpRequest;
@@ -66,7 +61,8 @@ class AuthControllerTest {
 
     @Test
     void login_withValidCredentials_returns200WithTokenAndUsername() {
-        when(jwtUtil.generateToken("adriano")).thenReturn("test.jwt.token");
+        when(authService.login("adriano", "tmp!pass"))
+                .thenReturn(new LoginResponseDTO("test.jwt.token", "adriano"));
 
         ResponseEntity<ApiResponse<LoginResponseDTO>> response =
                 controller.login(new LoginRequestDTO("adriano", "tmp!pass"), httpRequest);
@@ -81,7 +77,7 @@ class AuthControllerTest {
     @Test
     void login_withInvalidCredentials_returns401() {
         doThrow(new BadCredentialsException("bad credentials"))
-                .when(authenticationManager).authenticate(any());
+                .when(authService).login("adriano", "wrongpassword");
 
         ResponseEntity<ApiResponse<LoginResponseDTO>> response =
                 controller.login(new LoginRequestDTO("adriano", "wrongpassword"), httpRequest);

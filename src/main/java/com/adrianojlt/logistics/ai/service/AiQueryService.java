@@ -3,6 +3,7 @@ package com.adrianojlt.logistics.ai.service;
 import com.adrianojlt.logistics.ai.dto.AiQueryResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -37,38 +38,28 @@ public class AiQueryService {
         String generatedSql = cleanSql(llmService.chat(SQL_SYSTEM_PROMPT, sqlPrompt));
 
         if (!isSafeQuery(generatedSql)) {
-            return AiQueryResponseDTO.builder()
-                .question(question)
-                .generatedSql(generatedSql)
-                .success(false)
-                .errorMessage("Generated query is not a SELECT statement. Only read operations are permitted.")
-                .build();
+            return unsafeQueryError(question, generatedSql, "Generated query is not a SELECT statement. Only read operations are permitted.");
         }
 
+        List<Map<String, Object>> results;
         try {
-            List<Map<String, Object>> results = jdbcTemplate.queryForList(generatedSql);
-            return humanizeResults(question, generatedSql, results);
-        } catch (Exception firstError) {
+            results = jdbcTemplate.queryForList(generatedSql);
+        } catch (DataAccessException firstError) {
 
-            log.warn("SQL execution failed on first attempt: {}", firstError.getMessage());
+            log.warn("SQL execution failed on first attempt", firstError);
 
             String retryPrompt = buildSqlPrompt(schema, question, generatedSql, firstError.getMessage());
             String retrySql = cleanSql(llmService.chat(SQL_SYSTEM_PROMPT, retryPrompt));
 
             if (!isSafeQuery(retrySql)) {
-                return AiQueryResponseDTO.builder()
-                    .question(question)
-                    .generatedSql(retrySql)
-                    .success(false)
-                    .errorMessage("Retry generated an unsafe query.")
-                    .build();
+                return unsafeQueryError(question, retrySql, "Retry generated an unsafe query.");
             }
 
             try {
-                List<Map<String, Object>> results = jdbcTemplate.queryForList(retrySql);
+                results = jdbcTemplate.queryForList(retrySql);
                 return humanizeResults(question, retrySql, results);
-            } catch (Exception retryError) {
-                log.error("SQL execution failed on retry: {}", retryError.getMessage());
+            } catch (DataAccessException retryError) {
+                log.error("SQL execution failed on retry", retryError);
                 return AiQueryResponseDTO.builder()
                     .question(question)
                     .generatedSql(retrySql)
@@ -77,6 +68,17 @@ public class AiQueryService {
                     .build();
             }
         }
+
+        return humanizeResults(question, generatedSql, results);
+    }
+
+    private AiQueryResponseDTO unsafeQueryError(String question, String sql, String message) {
+        return AiQueryResponseDTO.builder()
+            .question(question)
+            .generatedSql(sql)
+            .success(false)
+            .errorMessage(message)
+            .build();
     }
 
     private AiQueryResponseDTO humanizeResults(String question, String sql, List<Map<String, Object>> results) {

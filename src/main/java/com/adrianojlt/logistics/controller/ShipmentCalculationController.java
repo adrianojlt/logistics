@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -31,8 +32,9 @@ public class ShipmentCalculationController {
 
     @PostMapping("/calculate")
     public ResponseEntity<ApiResponse<ShipmentCalculationResponseDTO>> calculate(
-            @Valid @RequestBody ShipmentCalculationRequestDTO request) {
-        ShipmentCalculationResponseDTO result = service.calculate(request);
+            @Valid @RequestBody ShipmentCalculationRequestDTO request,
+            Principal principal) {
+        ShipmentCalculationResponseDTO result = service.calculate(request, principal.getName());
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(result));
     }
 

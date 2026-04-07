@@ -5,23 +5,17 @@ import com.adrianojlt.logistics.dto.ShipmentCalculationResponseDTO;
 import com.adrianojlt.logistics.entity.ShipmentCalculation;
 import com.adrianojlt.logistics.mapper.ShipmentCalculationMapper;
 import com.adrianojlt.logistics.repository.ShipmentCalculationRepository;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.context.SecurityContextImpl;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -36,17 +30,6 @@ class ShipmentCalculationServiceTest {
 
     @Mock
     private ShipmentCalculationRepository repository;
-
-    @BeforeEach
-    void setDefaultSecurityContext() {
-        var auth = new UsernamePasswordAuthenticationToken("test-user", null, List.of());
-        SecurityContextHolder.setContext(new SecurityContextImpl(auth));
-    }
-
-    @AfterEach
-    void clearSecurityContext() {
-        SecurityContextHolder.clearContext();
-    }
 
     @Test
     void calculate_withAdditionalCost_computesCorrectTotals() {
@@ -64,7 +47,7 @@ class ShipmentCalculationServiceTest {
         when(repository.save(entity)).thenReturn(saved);
         when(mapper.toResponseDTO(saved)).thenReturn(expectedResponse);
 
-        ShipmentCalculationResponseDTO result = service.calculate(request);
+        ShipmentCalculationResponseDTO result = service.calculate(request, "test-user");
 
         assertThat(result).isEqualTo(expectedResponse);
         assertThat(entity.getTotalCosts()).isEqualByComparingTo("250.00");
@@ -87,7 +70,7 @@ class ShipmentCalculationServiceTest {
         when(repository.save(entity)).thenReturn(entity);
         when(mapper.toResponseDTO(entity)).thenReturn(new ShipmentCalculationResponseDTO());
 
-        service.calculate(request);
+        service.calculate(request, "test-user");
 
         assertThat(entity.getAdditionalCost()).isEqualByComparingTo(BigDecimal.ZERO);
         assertThat(entity.getTotalCosts()).isEqualByComparingTo("300.00");
@@ -108,7 +91,7 @@ class ShipmentCalculationServiceTest {
         when(repository.save(entity)).thenReturn(entity);
         when(mapper.toResponseDTO(entity)).thenReturn(new ShipmentCalculationResponseDTO());
 
-        service.calculate(request);
+        service.calculate(request, "test-user");
 
         assertThat(entity.getProfitMargin()).isEqualByComparingTo(BigDecimal.ZERO);
     }
@@ -127,17 +110,14 @@ class ShipmentCalculationServiceTest {
         when(repository.save(entity)).thenReturn(entity);
         when(mapper.toResponseDTO(entity)).thenReturn(new ShipmentCalculationResponseDTO());
 
-        service.calculate(request);
+        service.calculate(request, "test-user");
 
         assertThat(entity.getTotalCosts()).isEqualByComparingTo("600.00");
         assertThat(entity.getProfitOrLoss()).isEqualByComparingTo("-200.00");
     }
 
     @Test
-    void calculate_withAuthenticatedUser_setsCreatedByFromSecurityContext() {
-        var authentication = new UsernamePasswordAuthenticationToken("adriano", null, List.of());
-        SecurityContextHolder.setContext(new SecurityContextImpl(authentication));
-
+    void calculate_setsCreatedByFromPassedUsername() {
         ShipmentCalculationRequestDTO request = ShipmentCalculationRequestDTO.builder()
                 .income(new BigDecimal("1000.00"))
                 .cost(new BigDecimal("200.00"))
@@ -149,22 +129,9 @@ class ShipmentCalculationServiceTest {
         when(repository.save(entity)).thenReturn(entity);
         when(mapper.toResponseDTO(entity)).thenReturn(new ShipmentCalculationResponseDTO());
 
-        service.calculate(request);
+        service.calculate(request, "adriano");
 
         assertThat(entity.getCreatedBy()).isEqualTo("adriano");
-    }
-
-    @Test
-    void calculate_withNoAuthentication_throwsIllegalStateException() {
-        SecurityContextHolder.clearContext();
-
-        ShipmentCalculationRequestDTO request = ShipmentCalculationRequestDTO.builder()
-                .income(new BigDecimal("1000.00"))
-                .cost(new BigDecimal("200.00"))
-                .build();
-
-        assertThatThrownBy(() -> service.calculate(request))
-                .isInstanceOf(IllegalStateException.class);
     }
 
     @Test

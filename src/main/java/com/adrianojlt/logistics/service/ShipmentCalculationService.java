@@ -6,9 +6,9 @@ import com.adrianojlt.logistics.dto.ShipmentCalculationResponseDTO;
 import com.adrianojlt.logistics.dto.ShipmentStatsDTO;
 import com.adrianojlt.logistics.entity.ShipmentCalculation;
 import com.adrianojlt.logistics.mapper.ShipmentCalculationMapper;
+import com.adrianojlt.logistics.repository.CarrierStatsProjection;
 import com.adrianojlt.logistics.repository.ShipmentCalculationRepository;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import com.adrianojlt.logistics.repository.ShipmentStatsProjection;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,15 +33,7 @@ public class ShipmentCalculationService {
     }
 
     @Transactional
-    public ShipmentCalculationResponseDTO calculate(ShipmentCalculationRequestDTO request) {
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new IllegalStateException("No authenticated user in security context");
-        }
-
-        String createdBy = authentication.getName();
+    public ShipmentCalculationResponseDTO calculate(ShipmentCalculationRequestDTO request, String createdBy) {
 
         BigDecimal additionalCost = request.getAdditionalCost() != null
                 ? request.getAdditionalCost()
@@ -74,16 +66,16 @@ public class ShipmentCalculationService {
 
     @Transactional(readOnly = true)
     public ShipmentStatsDTO getStats() {
-
+        ShipmentStatsProjection p = repository.findStats();
         return ShipmentStatsDTO.builder()
-                .totalShipments(repository.countAll())
-                .totalIncome(repository.sumIncome())
-                .totalCosts(repository.sumTotalCosts())
-                .netProfitOrLoss(repository.sumProfitOrLoss())
-                .profitableCount(repository.countProfitable())
-                .lossCount(repository.countLoss())
-                .breakEvenCount(repository.countBreakEven())
-                .averageMargin(repository.averageMargin().setScale(2, RoundingMode.HALF_UP))
+                .totalShipments(p.getTotalShipments())
+                .totalIncome(p.getTotalIncome())
+                .totalCosts(p.getTotalCosts())
+                .netProfitOrLoss(p.getNetProfitOrLoss())
+                .profitableCount(p.getProfitableCount())
+                .lossCount(p.getLossCount())
+                .breakEvenCount(p.getBreakEvenCount())
+                .averageMargin(p.getAverageMargin().setScale(2, RoundingMode.HALF_UP))
                 .build();
     }
 
@@ -108,6 +100,8 @@ public class ShipmentCalculationService {
 
     @Transactional(readOnly = true)
     public List<CarrierStatsDTO> getStatsByCarrier() {
-        return repository.findStatsByCarrier();
+        return repository.findStatsByCarrier().stream()
+                .map(p -> new CarrierStatsDTO(p.getCarrier(), p.getAverageMargin(), p.getShipmentCount()))
+                .toList();
     }
 }

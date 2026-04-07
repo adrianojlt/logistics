@@ -52,6 +52,8 @@ class ShipmentCalculationControllerTest {
                 .income(new BigDecimal("1000.00"))
                 .cost(new BigDecimal("200.00"))
                 .additionalCost(new BigDecimal("50.00"))
+                .origin("Lisbon")
+                .destination("Madrid")
                 .build();
 
         ShipmentCalculationResponseDTO response = ShipmentCalculationResponseDTO.builder()
@@ -64,7 +66,7 @@ class ShipmentCalculationControllerTest {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        when(service.calculate(any())).thenReturn(response);
+        when(service.calculate(any(), any())).thenReturn(response);
 
         mockMvc.perform(post("/api/shipments/calculate")
                         .with(user("adriano").roles("USER"))
@@ -94,6 +96,8 @@ class ShipmentCalculationControllerTest {
         ShipmentCalculationRequestDTO request = ShipmentCalculationRequestDTO.builder()
                 .income(new BigDecimal("1000.00"))
                 .cost(new BigDecimal("-1.00"))
+                .origin("Lisbon")
+                .destination("Madrid")
                 .build();
 
         mockMvc.perform(post("/api/shipments/calculate")
