@@ -1,0 +1,178 @@
+<div class="dashboard-container">
+
+  <!-- KPI Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-3 col-sm-6">
+      @if (loading) {
+        <div class="kpi-card skeleton"></div>
+      } @else {
+        <div class="kpi-card">
+          <mat-icon class="kpi-icon" style="color: #1976D2">local_shipping</mat-icon>
+          <span class="kpi-label">Total Shipments</span>
+          <span class="kpi-value">{{ stats?.totalShipments }}</span>
+        </div>
+      }
+    </div>
+
+    <div class="col-md-3 col-sm-6">
+      @if (loading) {
+        <div class="kpi-card skeleton"></div>
+      } @else {
+        <div class="kpi-card">
+          <mat-icon class="kpi-icon" style="color: #388E3C">trending_up</mat-icon>
+          <span class="kpi-label">Total Income</span>
+          <span class="kpi-value">{{ stats?.totalIncome | currency:'EUR':'symbol':'1.2-2' }}</span>
+        </div>
+      }
+    </div>
+
+    <div class="col-md-3 col-sm-6">
+      @if (loading) {
+        <div class="kpi-card skeleton"></div>
+      } @else {
+        <div class="kpi-card">
+          <mat-icon class="kpi-icon" style="color: #F57C00">receipt_long</mat-icon>
+          <span class="kpi-label">Total Costs</span>
+          <span class="kpi-value">{{ stats?.totalCosts | currency:'EUR':'symbol':'1.2-2' }}</span>
+        </div>
+      }
+    </div>
+
+    <div class="col-md-3 col-sm-6">
+      @if (loading) {
+        <div class="kpi-card skeleton"></div>
+      } @else {
+        <div class="kpi-card">
+          <mat-icon class="kpi-icon" [style.color]="(stats?.netProfitOrLoss ?? 0) >= 0 ? '#388E3C' : '#D32F2F'">
+            {{ (stats?.netProfitOrLoss ?? 0) >= 0 ? 'arrow_upward' : 'arrow_downward' }}
+          </mat-icon>
+          <span class="kpi-label">Net Profit / Loss</span>
+          <span class="kpi-value"
+            [class.profit]="(stats?.netProfitOrLoss ?? 0) >= 0"
+            [class.loss]="(stats?.netProfitOrLoss ?? 0) < 0">
+            {{ stats?.netProfitOrLoss | currency:'EUR':'symbol':'1.2-2' }}
+          </span>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  @if (!loading && isEmpty) {
+    <div class="empty-state">
+      <mat-icon class="empty-icon">inbox</mat-icon>
+      <p class="empty-title">No shipment data yet.</p>
+      <p class="empty-subtitle">Go to Calculate Profit to add your first record.</p>
+      <button mat-flat-button color="primary" (click)="goToCalculateProfit()">
+        Go to Calculate Profit
+      </button>
+    </div>
+  }
+
+  <!-- Loading spinners for charts -->
+  @if (loading) {
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <div class="chart-card chart-loading">
+          <mat-spinner diameter="40" />
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="chart-card chart-loading">
+          <mat-spinner diameter="40" />
+        </div>
+      </div>
+    </div>
+    <div class="row g-3">
+      <div class="col-12">
+        <div class="chart-card chart-loading">
+          <mat-spinner diameter="40" />
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Charts -->
+  @if (!loading && !isEmpty) {
+    <div class="row g-3 mb-4">
+      <!-- Bar Chart -->
+      <div class="col-md-6">
+        <div class="chart-card">
+          <h3 class="chart-title">Income vs Total Costs</h3>
+          <div class="chart-area bar-chart-area">
+            <ngx-charts-bar-vertical-2d
+              [results]="barChartData"
+              [scheme]="barColorScheme"
+              [legend]="true"
+              [showXAxisLabel]="true"
+              [showYAxisLabel]="true"
+              xAxisLabel="Shipment"
+              yAxisLabel="Amount (€)"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Donut Chart -->
+      <div class="col-md-6">
+        <div class="chart-card">
+          <h3 class="chart-title">Profitable / Loss / Break-Even</h3>
+          <div class="chart-area donut-chart-area">
+            <ngx-charts-pie-chart
+              [results]="donutData"
+              [scheme]="donutColorScheme"
+              [legend]="true"
+              [doughnut]="true"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Line Chart -->
+    <div class="row g-3 mb-4">
+      <div class="col-12">
+        <div class="chart-card">
+          <h3 class="chart-title">Profit / Loss Trend</h3>
+          <div class="chart-area line-chart-area">
+            <ngx-charts-line-chart
+              [results]="lineChartData"
+              [scheme]="lineColorScheme"
+              [legend]="false"
+              [showXAxisLabel]="true"
+              [showYAxisLabel]="true"
+              xAxisLabel="Date"
+              yAxisLabel="Profit / Loss (€)"
+              [autoScale]="true"
+              [referenceLines]="lineReferenceLines"
+              [showRefLines]="true"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Carrier Bar Chart -->
+    <div class="row g-3">
+      <div class="col-12">
+        <div class="chart-card">
+          <h3 class="chart-title">Avg Margin by Carrier</h3>
+          @if (carrierChartData.length === 0) {
+            <p class="text-muted fst-italic">No carrier data available yet.</p>
+          } @else {
+            <div class="chart-area" style="height: 250px;">
+              <ngx-charts-bar-horizontal
+                [results]="carrierChartData"
+                [scheme]="carrierColorScheme"
+                [showXAxisLabel]="true"
+                xAxisLabel="Average Margin (%)"
+                [showDataLabel]="true"
+              />
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

@@ -1,0 +1,132 @@
+.dashboard-container {
+  padding: 24px;
+}
+
+.kpi-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 120px;
+}
+
+.kpi-card.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.kpi-label {
+  font-size: 0.85rem;
+  color: #757575;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.kpi-value {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #212121;
+}
+
+.kpi-value.profit {
+  color: #388E3C;
+}
+
+.kpi-value.loss {
+  color: #D32F2F;
+}
+
+.kpi-icon {
+  font-size: 2rem;
+  width: 2rem;
+  height: 2rem;
+}
+
+.chart-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  overflow: hidden;
+}
+
+.chart-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 16px 0;
+}
+
+.chart-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 350px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  gap: 8px;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 4rem;
+  width: 4rem;
+  height: 4rem;
+  color: #bdbdbd;
+}
+
+.empty-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #212121;
+  margin: 8px 0 0 0;
+}
+
+.empty-subtitle {
+  font-size: 0.95rem;
+  color: #757575;
+  margin: 0 0 16px 0;
+}
+
+.chart-area {
+  width: 100%;
+}
+
+.bar-chart-area {
+  height: 350px;
+}
+
+.donut-chart-area {
+  height: 350px;
+}
+
+.line-chart-area {
+  height: 300px;
+}
+
+ngx-charts-bar-vertical-2d,
+ngx-charts-pie-chart,
+ngx-charts-line-chart {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}

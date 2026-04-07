@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://teixeiradas.ddns.net'
+  apiUrl: 'https://teixeiradas.ddns.net/dachserboard'
 };

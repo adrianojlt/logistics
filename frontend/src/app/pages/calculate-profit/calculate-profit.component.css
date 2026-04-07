@@ -22,12 +22,50 @@
   font-weight: 600;
 }
 
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.export-btn {
+  margin-left: auto;
+}
+
+.badge-profit {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+.badge-loss {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+.badge-neutral {
+  background-color: #f5f5f5;
+  color: #616161;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
 .table-wrapper {
   overflow-x: auto;
 }
 
 @media (max-width: 767px) {
   .table-wrapper table {
-    min-width: 500px;
+    min-width: 600px;
   }
 }

@@ -5,5 +5,9 @@ export interface ShipmentModel {
   additionalCost: number;
   totalCosts: number;
   profitOrLoss: number;
+  profitMargin: number;
+  origin: string;
+  destination: string;
+  carrier: string | null;
   createdAt: string;
 }
